@@ -3,7 +3,7 @@ on:
   push
 
 jobs:
-  job_name:
+  say_hello:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
