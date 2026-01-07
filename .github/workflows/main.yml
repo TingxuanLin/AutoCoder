@@ -1,4 +1,4 @@
-name: Workflow Name
+name: Task 2
 on:
   push
 
