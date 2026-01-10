@@ -22,7 +22,7 @@ jobs:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           REPOSITORY: ${ GITHUB_REPOSITORY }
           TOKEN: ${{ secrets.TOKEN }}
-          API: ${{ secret.OPENAI_API_KEY }}
+          API: ${{ secrets.OPENAI_API_KEY }}
         run: |
           mkdir -p upload_artifacts
           ./script.sh $TOKEN $REPOSITORY $ISSUE_NUMBER $API  > ~/upload_artifacts/response.txt
