@@ -15,17 +15,17 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set permission for script.sh
-        run: chmod -x ~/scripts/script.sh
+        run: chmod -x scripts/script.sh
         
       - name: Run script.sh
         env:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
-          REPOSITORY: ${ GITHUB_REPOSITORY }
+          REPOSITORY: ${{ github.repository }}
           TOKEN: ${{ secrets.TOKEN }}
           API: ${{ secrets.OPENAI_API_KEY }}
         run: |
           mkdir -p upload_artifacts
-          ./script.sh $TOKEN $REPOSITORY $ISSUE_NUMBER $API  > ~/upload_artifacts/response.txt
+          ./scripts/script.sh $TOKEN $REPOSITORY $ISSUE_NUMBER $API  > upload_artifacts/response.txt
         
       - name: Upload generated files as artifacts
         uses: actions/upload-artifact@v4
