@@ -16,6 +16,13 @@ jobs:
 
       - name: Set permission for script.sh
         run: chmod -x scripts/script.sh
+
+      - name: Debug script permissions
+        run: |
+          ls -l scripts/script.sh
+          file scripts/script.sh
+          stat scripts/script.sh
+
         
       - name: Run script.sh
         env:
