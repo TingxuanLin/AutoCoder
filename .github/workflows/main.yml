@@ -38,8 +38,8 @@ jobs:
         uses: actions/download-artifact@v5
         with:
           name: autocoder-artifact
-          path: downloaded_artifacts
+          path: autocoder-artifact
 
       - name: List files in artifacts
-        run: ls -R downloaded_artifacts
+        run: ls -R autocoder-artifact
     
