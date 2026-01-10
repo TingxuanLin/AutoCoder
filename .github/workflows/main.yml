@@ -1,4 +1,4 @@
-name: Access Issue Information
+name: Interacting with LLMs
 
 on:
   issues:
@@ -7,27 +7,36 @@ on:
       - reopened
 
 jobs:
-  access_issue_info:
+  interacting_with_LLMs:
     runs-on: ubuntu-latest
-
+    if: contains(github.event.issue.labels.*.name, 'autocoder-bot')
     steps:
-      # 1️⃣ Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Read issue data via environment variables
-      - name: Print Issue Information
+      - name: Set permission for script.sh
+        run: chmod -x ~/scripts/script.sh
+        
+      - name: Run script.sh
         env:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
-          ISSUE_TITLE: ${{ github.event.issue.title }}
-          ISSUE_BODY: ${{ github.event.issue.body }}
-          ISSUE_ASSIGNEES: ${{ join(github.event.issue.assignees.*.login, ', ') }}
-          ISSUE_LABELS: ${{ join(github.event.issue.labels.*.name, ', ') }}
+          REPOSITORY: ${ GITHUB_REPOSITORY }
         run: |
-          echo "Issue Number: $ISSUE_NUMBER"
-          echo "Issue Title: $ISSUE_TITLE"
-          echo "Issue Body: $ISSUE_BODY"
-          echo "Issue Assignees: $ISSUE_ASSIGNEES"
-          echo "Issue Labels: $ISSUE_LABELS"
-
+          mkdir -p upload_artifacts
+          ./script.sh  ${{ secret.TOKEN }} $REPOSITORY $ISSUE_NUMBER  ${{ secret.OPENAI_API_KEY }} > ~/upload_artifacts/response.txt
+        
+      - name: Upload generated files as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: autocoder-artifact
+          path: upload_artifacts
           
+      - name: Download artifacts
+        uses: actions/download-artifact@v5
+        with:
+          name: autocoder-artifact
+          path: downloaded_artifacts
+
+      - name: List files in artifacts
+        run: ls -R downloaded_artifacts
+    
