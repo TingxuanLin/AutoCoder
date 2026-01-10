@@ -5,6 +5,7 @@ on:
     types:
       - opened
       - reopened
+      - labeled
 
 jobs:
   interacting_with_LLMs:
