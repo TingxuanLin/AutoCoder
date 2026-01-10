@@ -21,9 +21,11 @@ jobs:
         env:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           REPOSITORY: ${ GITHUB_REPOSITORY }
+          TOKEN: ${{ secrets.TOKEN }}
+          API: ${{ secret.OPENAI_API_KEY }}
         run: |
           mkdir -p upload_artifacts
-          ./script.sh  ${{ secret.TOKEN }} $REPOSITORY $ISSUE_NUMBER  ${{ secret.OPENAI_API_KEY }} > ~/upload_artifacts/response.txt
+          ./script.sh $TOKEN $REPOSITORY $ISSUE_NUMBER $API  > ~/upload_artifacts/response.txt
         
       - name: Upload generated files as artifacts
         uses: actions/upload-artifact@v4
