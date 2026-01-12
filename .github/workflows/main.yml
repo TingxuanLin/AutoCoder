@@ -1,4 +1,4 @@
-name: Interacting with LLMs
+name: Opening a pull request
 
 on:
   issues:
@@ -6,9 +6,12 @@ on:
       - opened
       - reopened
       - labeled
-
+permissions:
+  contents: write
+  pull-requests: write
+  
 jobs:
-  interacting_with_LLMs:
+  opening_a_pull_request:
     runs-on: ubuntu-latest
     if: contains(github.event.issue.labels.*.name, 'autocoder-bot')
     steps:
@@ -28,18 +31,18 @@ jobs:
           mkdir -p upload_artifacts
           ./scripts/script.sh $TOKEN $REPOSITORY $ISSUE_NUMBER $API  > upload_artifacts/response.txt
         
-      - name: Upload generated files as artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: autocoder-artifact
-          path: upload_artifacts
-          
-      - name: Download artifacts
-        uses: actions/download-artifact@v5
-        with:
-          name: autocoder-artifact
-          path: autocoder-artifact
+      - name: Commit files
+        run: |
+          git config user.name "autocoder-bot"
+          git config user.email "actions@github.com"
+          git add -A
+          git commit -m "Update files during workflow."
 
-      - name: List files in artifacts
-        run: ls -R autocoder-artifact
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v8
+        with:
+          branch: autocoder-branch-${{ github.event.issue.number }}
+          base: main
+          labels: autocoder-bot
+
     
