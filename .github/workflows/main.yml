@@ -36,11 +36,16 @@ jobs:
           git config user.name "autocoder-bot"
           git config user.email "actions@github.com"
 
-          BRANCH=autocoder-branch-${{ github.event.issue.number }}
-          git checkout -b $BRANCH
           git add -A
           git commit -m "Generate code for issue #${{ github.event.issue.number }}"
-          git push origin $BRANCH
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v8
+        with:
+          branch: autocoder-branch-${{ github.event.issue.number }}
+          base: main
+          labels: autocoder-bot
+
 
 
     
