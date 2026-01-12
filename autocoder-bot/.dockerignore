@@ -1,0 +1,7 @@
+# Ignore unnecessary files
+*.pyc
+__pycache__/
+.git/
+.gitignore
+README.md
+docker-compose.yml
