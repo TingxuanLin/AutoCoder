@@ -29,9 +29,17 @@ jobs:
         run: |
           git config user.email "actions@github.com"
           git config user.name "autocoder-bot"
-
           BRANCH=autocoder-branch-${{ github.event.issue.number }}
           git checkout -b $BRANCH
           git add .
           git commit -m "Add code snippets from issue #${{ github.event.issue.number }}" || echo "No changes"
+          git fetch origin
+          if git ls-remote --exit-code --heads origin $BRANCH; then
+            echo "Remote branch exists, rebasing..."
+            git checkout $BRANCH
+            git pull --rebase origin $BRANCH
+          else
+            echo "Creating new branch..."
+            git checkout -b $BRANCH
+          fi
           git push origin $BRANCH
