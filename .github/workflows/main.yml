@@ -1,4 +1,4 @@
-name: Opening a pull request
+name: Issue Interaction with ChatGPT
 
 on:
   issues:
@@ -6,46 +6,46 @@ on:
       - opened
       - reopened
       - labeled
+
 permissions:
   contents: write
   pull-requests: write
-  
+
 jobs:
-  opening_a_pull_request:
+  run-tests:
     runs-on: ubuntu-latest
     if: contains(github.event.issue.labels.*.name, 'autocoder-bot')
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set permission for script.sh
-        run: chmod +x scripts/script.sh
-        
-      - name: Run script.sh
+      - name: Make script executable
+        run: chmod +x ./scripts/script.sh
+
+      - name: Run interaction script
         env:
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPOSITORY: ${{ github.repository }}
-          TOKEN: ${{ secrets.TOKEN }}
-          API: ${{ secrets.OPENAI_API_KEY }}
-        run: |
-          mkdir -p upload_artifacts
-          ./scripts/script.sh $TOKEN $REPOSITORY $ISSUE_NUMBER $API  > upload_artifacts/response.txt
-        
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: ./scripts/script.sh $GITHUB_TOKEN $REPOSITORY $ISSUE_NUMBER $OPENAI_API_KEY
+
       - name: Commit files
         run: |
-          git config user.name "autocoder-bot"
-          git config user.email "actions@github.com"
-
-          git add -A
-          git commit -m "Generate code for issue #${{ github.event.issue.number }}"
-
+          git config --local user.email "actions@github.com"
+          git config --local user.name "autocoder-bot"
+          git add .
+          git commit -m "Add code snippets from issue #${{ github.event.issue.number }}" -a || echo "No changes to commit"
       - name: Create pull request
+        if: success()
         uses: peter-evans/create-pull-request@v6
         with:
-          branch: autocoder-branch-${{ github.event.issue.number }}
-          base: main
-          labels: autocoder-bot
-
-
-
-    
+          commit-message: "Add code snippets from issue #${{ github.event.issue.number }}"
+          title: "Add code snippets from issue #${{ github.event.issue.number }}"
+          body: |
+              This pull request adds code snippets from issue #${{ github.event.issue.number }}.
+          branch: "autocoder-branch-${{ github.event.issue.number }}"
+          base: "main"
+          labels: "autocoder-bot"
+          reviewers: "autocoder-bot"
+          assignees: "autocoder-bot"
